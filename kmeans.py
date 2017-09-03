@@ -1,49 +1,53 @@
+import helpers
 import models
 import matplotlib.pyplot as plt
-import csv
 import numpy as np
-from collections import defaultdict
 
-#Matplotlib for graph yo
+def assignCluster(vectors, clusters):
+    for i in vectors:
+        for y in clusters:
+            if i.cluster is None or helpers.distance(i, y) < helpers.distance(i, i.cluster):
+                i.cluster = y
+                y.vectors.append(i)
 
-
-def dataHelper(fileName, delimiterChar):
-    columns = defaultdict(list)
-
-    with open(fileName, newline='') as dataFile:
-        data = csv.DictReader(dataFile, delimiter=delimiterChar)
-        for row in data:
-            for (k,v) in row.items():
-                columns[k].append(v)
-
-    return columns
-
-def getDistance(a, b):
-    return np.linalg.norm(a-b) # Euclidean
 
 def generateClusters(vectors, k):
     clusters = []
 
     for i in np.random.randint(len(vectors), size=k):
-        cluster = models.Cluster(vectors[i].coordinates, (0,0))
+        cluster = models.Cluster(vectors[i].coordinates, [])
         clusters.append(cluster)
 
     return clusters
 
+def moveClusters(vectors, clusters):
+    for i in clusters:
+       i.coordinates = (helpers.avg(i.getCoordinateList(0)), helpers.avg(i.getCoordinateList(1)))
+
+def graph(vectors, clusters):
+    for i in vectors:
+        plt.plot(i.x(), i.y(), 'ro')
+
+    for i in clusters:
+        plt.plot(i.x(), i.y(), 'bo')
+
+    plt.show()
+
 if __name__ == "__main__":
     k = 4 # Number of clusters
-
-    data = dataHelper('data_1024.csv', '\t')
+    print("Reading data file")
+    data = helpers.readData('data_1024.csv', '\t')
 
     vectors = []
 
     for coord in zip(data['Distance_Feature'], data['Speeding_Feature']):
-        vector = models.Point(coord, 0)
+        vector = models.Point(coord, None)
         vectors.append(vector)
 
-    plt.plot(data['Distance_Feature'], data['Speeding_Feature'], 'ro')
-
-    for i in generateClusters(vectors, k):
-        plt.plot(i.x(), i.y(), 'bo')
-
-    plt.show()
+    print("Generating clusters")
+    clusters = generateClusters(vectors, k)
+    print("Assigning clusters")
+    assignCluster(vectors, clusters)
+    print("Moving....")
+    moveClusters(vectors, clusters)
+    graph(vectors, clusters)
