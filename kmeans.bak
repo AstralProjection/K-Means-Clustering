@@ -8,13 +8,8 @@ def assignCluster(vectors, clusters):
         for y in clusters:
             if i.cluster is None or helpers.distance(i, y) < helpers.distance(i, i.cluster):
                 i.cluster = y
+                y.vectors.append(i)
 
-    for x in vectors:
-        for z in clusters:
-            if x.cluster == z:
-                z.vectors.append(x)
-
-    return moveClusters(clusters)
 
 def generateClusters(vectors, k):
     for i in np.random.randint(len(vectors), size=k):
@@ -26,8 +21,7 @@ def generateClusters(vectors, k):
 def moveClusters(clusters):
     for i in clusters:
        i.coordinates = (helpers.avg(i.getCoordinateList(0)), helpers.avg(i.getCoordinateList(1)))
-
-    return clusters
+       print(clusters)
 
 def graph(vectors, clusters):
     for i in vectors:
@@ -41,17 +35,15 @@ def graph(vectors, clusters):
 if __name__ == "__main__":
     vectors = []
     clusters = []
-    k = 4 # Number of clusters
+    k = 2 # Number of clusters
     data = helpers.readData('data_1024.csv', '\t')
 
     for coord in zip(data['Distance_Feature'], data['Speeding_Feature']):
         vector = models.Point(coord, None)
         vectors.append(vector)
 
-    clusters = generateClusters(vectors, k)
-    for i in range(0, 50):
-        clusters = assignCluster(vectors, clusters)
-        for y in clusters:
-            print(y.coordinates)
-
+    generateClusters(vectors, k)
+    assignCluster(vectors, clusters)
+    for i in range(0, 5):
+        moveClusters(clusters)
     graph(vectors, clusters)
