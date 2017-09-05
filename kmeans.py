@@ -38,10 +38,14 @@ def graph(vectors, clusters):
 
     plt.show()
 
+def iterateClusters(vectors, clusters, old=[]):
+    new = assignCluster(vectors, clusters)
+    iterateClusters(vectors, new, clusters)
+
 if __name__ == "__main__":
     vectors = []
     clusters = []
-    k = 4 # Number of clusters
+    k = 7 # Number of clusters
     data = helpers.readData('data_1024.csv', '\t')
 
     for coord in zip(data['Distance_Feature'], data['Speeding_Feature']):
@@ -49,9 +53,18 @@ if __name__ == "__main__":
         vectors.append(vector)
 
     clusters = generateClusters(vectors, k)
-    for i in range(0, 50):
+
+
+    coordList = [] # Used for detecting duplicates, once a duplicate is shown the loop will break.
+
+    while True:
         clusters = assignCluster(vectors, clusters)
+
         for y in clusters:
-            print(y.coordinates)
+            coordList.append(y.coordinates)
+            print(str(y.coordinates) + '\n -------')
+
+        if len(helpers.listDuplicates(coordList)) != 0:
+            break
 
     graph(vectors, clusters)

@@ -18,4 +18,17 @@ def distance(a, b):
     return math.sqrt((b.x() - a.x())**2 + (b.y() - a.y())**2)
 
 def avg(list):
-    return sum(list)/float(len(list))
+    return float("%.2f" % round(sum(list)/float(len(list)), 3))
+
+def listDuplicates(l): # Ugly but quick
+    seen = set()
+    seen2 = set()
+    seen_add = seen.add
+    seen2_add = seen2.add
+    for i in l:
+        if i in seen:
+            seen2_add(i)
+        else:
+            seen_add(i)
+    return list(seen2)
+
