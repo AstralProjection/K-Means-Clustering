@@ -1,4 +1,4 @@
-# kMeansCluster
+# K-Means Clustering
 
 Here is an example when k = 4
 
